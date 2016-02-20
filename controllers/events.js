@@ -2,7 +2,7 @@ Events = require('../models/events.js');
 
 module.exports = function(app) {
 
-	app.post('/events/create', function(req, res) {
+	app.post('/api/events/create', function(req, res) {
 		Events.create(req.body.name, function(err, result) {
 			if (err) {
 				console.log(err);
@@ -13,7 +13,7 @@ module.exports = function(app) {
 		});
 	});
 
-	app.get('/events', function(req, res) {
+	app.get('/api/events', function(req, res) {
 		Events.all(function(err, docs) {
 			docs.toArray(function(err, els) {
 				res.json({ events: els });

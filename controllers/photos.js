@@ -10,7 +10,7 @@ var Photos = require('../models/photos.js');
 
 module.exports = function(app) {
 
-	app.post('/upload', function(req, res) {
+	app.post('/api/upload', function(req, res) {
 		Photos.create(req.body.eventId, req.body.title, req.body.description, function(err, result) {
 			if (err) {
 				console.log(err);
@@ -58,7 +58,7 @@ module.exports = function(app) {
 		});
 	});
 
-	app.get('/photos', function(req, res) {
+	app.get('/api/photos', function(req, res) {
 		Photos.all(function(err, docs) {
 			docs.toArray(function(err, els) {
 				res.json({ photos: els });
@@ -66,7 +66,7 @@ module.exports = function(app) {
 		});
 	});
 
-	app.get('/photos?eventId=:eventId', function(req, res) {
+	app.get('/api/photos?eventId=:eventId', function(req, res) {
 		var eventId = req.query.eventId;
 		Photos.fromEvent(eventId, function(err, docs) {
 			docs.toArray(function(err, els) {
@@ -75,14 +75,14 @@ module.exports = function(app) {
 		});
 	});
 
-	app.get('/photos/full/:file', function (req, res) {
+	app.get('/api/photos/full/:file', function (req, res) {
 		var s3 = new AWS.S3();
 		var params = { Bucket: 'djinnapp', Key: 'full/' + req.params.file };
 		// TODO: Error checking
 		s3.getObject(params).createReadStream().pipe(res);
 	});
 
-	app.get('/photos/thumb/:file', function (req, res) {
+	app.get('/api/photos/thumb/:file', function (req, res) {
 		var s3 = new AWS.S3();
 		var params = { Bucket: 'djinnapp', Key: 'thumb/' + req.params.file };
 		// TODO: Error checking
