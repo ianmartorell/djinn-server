@@ -1,6 +1,7 @@
 var fs = require('fs');
 var AWS = require('aws-sdk');
 
+// TODO: Move to environment variables
 AWS.config.region = 'eu-west-1';
 AWS.config.update({ accessKeyId: 'AKIAIQCKYD7IY2AYZ24Q', secretAccessKey: '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' });
 
