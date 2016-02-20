@@ -23,7 +23,7 @@ module.exports = function(app) {
 				fs.readFile(req.files.image.path, function (err, fullData){
 					if (err) throw err;
 					var s3 = new AWS.S3({ params: { Bucket: 'djinnapp' } });
-
+					// Upload full image
 					var fullKey = 'full/' + id + '.jpg';
 					s3.putObject({
 						Key: fullKey,
@@ -37,7 +37,7 @@ module.exports = function(app) {
 							res.json({ 'response': "Saved" });
 						}
 					});
-
+					// Create thumbnail and upload it
 					thumbKey = 'thumb/' + id + '.jpg';
 					var size = {width: 200, height: 200};
 					thumbStrm = gm(req.files.image.path)
@@ -70,16 +70,16 @@ module.exports = function(app) {
 		});
 	});
 
-	app.get('/thumb/:file', function (req, res) {
+	app.get('/full/:file', function (req, res) {
 		var s3 = new AWS.S3();
-		var params = { Bucket: 'djinnapp', Key: 'thumb/' + req.params.file };
+		var params = { Bucket: 'djinnapp', Key: 'full/' + req.params.file };
 		// TODO: Error checking
 		s3.getObject(params).createReadStream().pipe(res);
 	});
 
-	app.get('/full/:file', function (req, res) {
+	app.get('/thumb/:file', function (req, res) {
 		var s3 = new AWS.S3();
-		var params = { Bucket: 'djinnapp', Key: 'full/' + req.params.file };
+		var params = { Bucket: 'djinnapp', Key: 'thumb/' + req.params.file };
 		// TODO: Error checking
 		s3.getObject(params).createReadStream().pipe(res);
 	});
