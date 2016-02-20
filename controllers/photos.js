@@ -1,4 +1,5 @@
 var fs = require('fs');
+var gm = require('gm');
 var AWS = require('aws-sdk');
 
 // TODO: Move to environment variables
@@ -7,46 +8,58 @@ AWS.config.update({ accessKeyId: 'AKIAIQCKYD7IY2AYZ24Q', secretAccessKey: 'fBG4T
 
 var Photos = require('../models/photos.js');
 
-function upload(folder, req, res) {
-	Photos.create('', '', function(err, result) {
-		if (err) {
-			console.log(err);
-		} else {
-			id = result.ops[0]._id;
-			fs.readFile(req.files.image.path, function (err, data){
-				if (err) { throw err; }
-				var s3 = new AWS.S3();
-				var key = folder + '/' + id + '.jpg';
-				s3.putObject({
-					Bucket: 'djinnapp',
-					Key: key,
-					Body: data
-				}, function(err, data) {
-					if (err) {
-						console.log(err);
-						res.json({ 'response': "Error", 'message': err.message });
-					} else {
-						console.log("Successfully uploaded " + key);
-						res.json({ 'response': "Saved" });
-					}
-				});
-			});
-		}
-	});
-};
-
 module.exports = function(app) {
 
 	app.get('/',function(req,res){
 		res.end('Welcome to Djinn');
 	});
 
-	app.post('/upload-thumb', function(req, res) {
-		upload('thumb', req, res);
-	});
+	app.post('/upload', function(req, res) {
+		Photos.create(req.title, req.description, function(err, result) {
+			if (err) {
+				console.log(err);
+			} else {
+				id = result.ops[0]._id;
+				fs.readFile(req.files.image.path, function (err, fullData){
+					if (err) throw err;
+					var s3 = new AWS.S3({ params: { Bucket: 'djinnapp' } });
 
-	app.post('/upload-full', function(req, res) {
-		upload('full', req, res);
+					var fullKey = 'full/' + id + '.jpg';
+					s3.putObject({
+						Key: fullKey,
+						Body: fullData
+					}, function(err, data) {
+						if (err) {
+							console.log(err);
+							res.json({ 'response': "Error", 'message': err.message });
+						} else {
+							console.log("Successfully uploaded " + fullKey);
+							res.json({ 'response': "Saved" });
+						}
+					});
+
+					thumbKey = 'thumb/' + id + '.jpg';
+					var size = {width: 200, height: 200};
+					thumbStrm = gm(req.files.image.path)
+					.resize(size.width, size.height, "^>")
+					.gravity('Center')
+					.extent(size.width, size.height)
+					.stream()
+					s3.upload({
+						Key: thumbKey,
+						Body: thumbStrm
+					}, function(err, data) {
+						if (err) {
+							console.log(err);
+							res.json({ 'response': "Error", 'message': err.message });
+						} else {
+							console.log("Successfully uploaded " + thumbKey);
+							res.json({ 'response': "Saved" });
+						}
+					});
+				});
+			}
+		});
 	});
 
 	app.get('/list', function(req, res) {

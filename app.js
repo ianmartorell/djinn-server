@@ -24,12 +24,12 @@ require('./controllers/photos.js')(app);
 
 // Connect to Mongo on start
 db.connect('mongodb://localhost:27017/djinn', function(err) {
-  if (err) {
-    console.log('Unable to connect to Mongo.');
-    process.exit(1);
-  } else {
-    app.listen(port, function() {
-      console.log('Listening on port ' + port);
-    });
-  }
+	if (err) {
+		console.log('Unable to connect to Mongo.');
+		process.exit(1);
+	} else {
+		app.listen(port, function() {
+			console.log('Listening on port ' + port);
+		});
+	}
 });
