@@ -18,8 +18,7 @@ app.use(connect.bodyParser());
 app.use(connect.json());
 app.use(connect.urlencoded());
 
-
-// Routes
+require('./controllers/routes.js')(app);
 require('./controllers/photos.js')(app);
 
 // Connect to Mongo on start

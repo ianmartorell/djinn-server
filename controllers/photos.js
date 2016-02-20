@@ -10,10 +10,6 @@ var Photos = require('../models/photos.js');
 
 module.exports = function(app) {
 
-	app.get('/',function(req,res){
-		res.end('Welcome to Djinn');
-	});
-
 	app.post('/upload', function(req, res) {
 		Photos.create(req.title, req.description, function(err, result) {
 			if (err) {
