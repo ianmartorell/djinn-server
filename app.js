@@ -16,8 +16,22 @@ app.use(connect.bodyParser());
 app.use(connect.json());
 app.use(connect.urlencoded());
 
-// Routes
-require('./routes/routes.js')(app);
+var MongoClient = require('mongodb').MongoClient
+var assert = require('assert');
 
-app.listen(port);
-console.log('The App runs on port ' + port);
+var url = 'mongodb://localhost:27017/djinn';
+// Use connect method to connect to the Server
+MongoClient.connect(url, function(err, db) {
+  assert.equal(null, err);
+  console.log("Connected correctly to mongodb");
+
+  // Classes
+  require('./models.js')(app);
+
+	// Routes
+	require('./routes.js')(app);
+
+	app.listen(port);
+	console.log('The App runs on port ' + port);
+  db.close();
+});
