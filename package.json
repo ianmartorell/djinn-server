@@ -1,9 +1,11 @@
 {
-	"name": "djinn-server",
-	"version": "0.0.1",
-	"main": "app.js",
-	"dependencies": {
-		"express" : "~4.0.0",
-		"connect": "~2.14.4"
+  "name": "djinn-server",
+  "version": "0.0.1",
+  "main": "app.js",
+  "dependencies": {
+    "aws-sdk": "^2.2.37",
+    "connect": "~2.14.4",
+    "express": "~4.0.0",
+    "mongodb": "^2.1.7"
   }
 }
