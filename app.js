@@ -20,6 +20,7 @@ app.use(connect.urlencoded());
 
 require('./controllers/routes.js')(app);
 require('./controllers/photos.js')(app);
+require('./controllers/events.js')(app);
 
 // Connect to Mongo on start
 db.connect('mongodb://localhost:27017/djinn', function(err) {

@@ -11,7 +11,7 @@ var Photos = require('../models/photos.js');
 module.exports = function(app) {
 
 	app.post('/upload', function(req, res) {
-		Photos.create(req.title, req.description, function(err, result) {
+		Photos.create(req.body.eventId, req.body.title, req.body.description, function(err, result) {
 			if (err) {
 				console.log(err);
 			} else {
@@ -27,10 +27,10 @@ module.exports = function(app) {
 					}, function(err, data) {
 						if (err) {
 							console.log(err);
-							res.json({ 'response': "Error", 'message': err.message });
+							res.json({ 'status': "Error", 'message': err.message });
 						} else {
 							console.log("Successfully uploaded " + fullKey);
-							res.json({ 'response': "Saved" });
+							res.json({ 'status': "Success" });
 						}
 					});
 					// Create thumbnail and upload it
@@ -47,10 +47,10 @@ module.exports = function(app) {
 					}, function(err, data) {
 						if (err) {
 							console.log(err);
-							res.json({ 'response': "Error", 'message': err.message });
+							res.json({ 'status': "Error", 'message': err.message });
 						} else {
 							console.log("Successfully uploaded " + thumbKey);
-							res.json({ 'response': "Saved" });
+							res.json({ 'status': "Success" });
 						}
 					});
 				});
@@ -58,7 +58,7 @@ module.exports = function(app) {
 		});
 	});
 
-	app.get('/list', function(req, res) {
+	app.get('/photos', function(req, res) {
 		Photos.all(function(err, docs) {
 			docs.toArray(function(err, els) {
 				res.json({ photos: els });
@@ -66,14 +66,23 @@ module.exports = function(app) {
 		});
 	});
 
-	app.get('/full/:file', function (req, res) {
+	app.get('/photos?eventId=:eventId', function(req, res) {
+		var eventId = req.query.eventId;
+		Photos.fromEvent(eventId, function(err, docs) {
+			docs.toArray(function(err, els) {
+				res.json({ photos: els });
+			});
+		});
+	});
+
+	app.get('/photos/full/:file', function (req, res) {
 		var s3 = new AWS.S3();
 		var params = { Bucket: 'djinnapp', Key: 'full/' + req.params.file };
 		// TODO: Error checking
 		s3.getObject(params).createReadStream().pipe(res);
 	});
 
-	app.get('/thumb/:file', function (req, res) {
+	app.get('/photos/thumb/:file', function (req, res) {
 		var s3 = new AWS.S3();
 		var params = { Bucket: 'djinnapp', Key: 'thumb/' + req.params.file };
 		// TODO: Error checking
