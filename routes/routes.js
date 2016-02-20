@@ -16,11 +16,11 @@ function upload(folder, req, res) {
 			Body: data
 		}, function(err, data) {
 			if (err) {
-				console.log(err)
-				res.json({'response':"Error"});
+				console.log(err);
+				res.json({ 'response':"Error", 'message': err.message });
 			} else {
-				console.log("Successfully uploaded data to myBucket/myKey");
-				res.json({'response':"Saved"});
+				console.log("Successfully uploaded data to " + folder + '/' + req.files.image.originalFilename);
+				res.json({ 'response':"Saved" });
 			}
 		});
 	});
@@ -39,11 +39,17 @@ module.exports = function(app) {
 		upload('full', req, res);
 	});
 
-	app.get('/uploads/:file', function (req, res){
-		file = req.params.file;
-		var dirname = "/Users/ian/djinn";
-		var img = fs.readFileSync(dirname + "/uploads/" + file);
-		res.writeHead(200, {'Content-Type': 'image/jpg' });
-		res.end(img, 'binary');
+	app.get('/thumb/:file', function (req, res) {
+		var s3 = new AWS.S3();
+		var params = { Bucket: 'djinnapp', Key: 'thumb/' + req.params.file };
+		// TODO: Error checking
+		s3.getObject(params).createReadStream().pipe(res);
+	});
+
+	app.get('/full/:file', function (req, res) {
+		var s3 = new AWS.S3();
+		var params = { Bucket: 'djinnapp', Key: 'full/' + req.params.file };
+		// TODO: Error checking
+		s3.getObject(params).createReadStream().pipe(res);
 	});
 };
