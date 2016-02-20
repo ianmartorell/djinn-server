@@ -7,6 +7,8 @@ var connect  = require('connect');
 var app      = express();
 var port     = process.env.PORT || 8080;
 
+var db = require('./db');
+
 // Configuration
 app.use(express.static(__dirname + '/public'));
 app.use(connect.cookieParser());
@@ -16,22 +18,18 @@ app.use(connect.bodyParser());
 app.use(connect.json());
 app.use(connect.urlencoded());
 
-var MongoClient = require('mongodb').MongoClient
-var assert = require('assert');
 
-var url = 'mongodb://localhost:27017/djinn';
-// Use connect method to connect to the Server
-MongoClient.connect(url, function(err, db) {
-  assert.equal(null, err);
-  console.log("Connected correctly to mongodb");
+// Routes
+require('./controllers/photos.js')(app);
 
-  // Classes
-  require('./models.js')(app);
-
-	// Routes
-	require('./routes.js')(app);
-
-	app.listen(port);
-	console.log('The App runs on port ' + port);
-  db.close();
+// Connect to Mongo on start
+db.connect('mongodb://localhost:27017/djinn', function(err) {
+  if (err) {
+    console.log('Unable to connect to Mongo.');
+    process.exit(1);
+  } else {
+    app.listen(port, function() {
+      console.log('Listening on port ' + port);
+    });
+  }
 });
