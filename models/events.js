@@ -3,7 +3,8 @@ var db = require('../db');
 exports.create = function(name, cb) {
 	var collection = db.get().collection('events');
 	var event = {
-		name: name
+		name: name,
+		date: new Date().toString()
 	};
 	collection.save(event, cb);
 };
