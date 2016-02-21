@@ -58,28 +58,31 @@ module.exports = function(app) {
 		});
 	});
 
-	app.get('/api/photos', function(req, res) {
-		Photos.all(function(err, docs) {
-			docs.toArray(function(err, els) {
-				res.json({ photos: els });
-			});
-		});
-	});
-
-	app.get('/api/photos?eventId=:eventId', function(req, res) {
+	app.get('/api/photos?:eventId', function(req, res) {
 		var eventId = req.query.eventId;
-		Photos.fromEvent(eventId, function(err, docs) {
+		if (!!eventId) {
+			Photos.fromEvent(eventId, function(err, docs) {
 			docs.toArray(function(err, els) {
 				res.json({ photos: els });
 			});
 		});
+		} else {
+			Photos.all(function(err, docs) {
+				docs.toArray(function(err, els) {
+					res.json({ photos: els });
+				});
+			});
+		}
+
 	});
 
 	app.get('/api/photos/full/:file', function (req, res) {
 		var s3 = new AWS.S3();
 		var params = { Bucket: 'djinnapp', Key: 'full/' + req.params.file };
 		// TODO: Error checking
-		s3.getObject(params).createReadStream().pipe(res);
+		stream = s3.getObject(params).createReadStream();
+		stream.on('error', function (error) {console.log("Caught", error);});
+		stream.pipe(res);
 	});
 
 	app.get('/api/photos/thumb/:file', function (req, res) {
