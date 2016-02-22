@@ -23,7 +23,7 @@ require('./controllers/photos.js')(app);
 require('./controllers/events.js')(app);
 
 // Connect to Mongo on start
-db.connect('mongodb://localhost:27017/djinn', function(err) {
+db.connect(process.env.MONGOLAB_URI, function(err) {
 	if (err) {
 		console.log('Unable to connect to Mongo.');
 		process.exit(1);
