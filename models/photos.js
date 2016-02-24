@@ -6,7 +6,7 @@ exports.create = function(eventId, title, description, cb) {
 		eventId: eventId,
 		title: title,
 		description: description,
-		date: new Date().toString()
+		date: new Date()
 	};
 	collection.save(photo, cb);
 };
@@ -18,7 +18,7 @@ exports.get = function(id, cb) {
 
 exports.fromEvent = function(eventId, cb) {
 	var collection = db.get().collection('photos');
-	collection.find({eventId: eventId}, cb);
+	collection.find({eventId: eventId}, {sort: {date: -1}}, cb);
 };
 
 exports.all = function(cb) {
